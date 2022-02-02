@@ -1,0 +1,28 @@
+{
+  "name": "hopeofiran/parsian-refund",
+  "keywords": ["parsian", "refund", "parsianrefund", "refundparsian"],
+  "license": "MIT",
+  "homepage": "https://github.com/hopeofiran/parsian-refund",
+  "description": "This package allows the use of Parsian payment gateway refund system.",
+  "authors": [
+    {
+      "name": "Omid Mehri",
+      "email": "thehopeofiran@gmail.com",
+      "homepage": "https://github.com/hopeofiran/"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": "^7.3",
+    "laravel/framework": ">=6.0",
+    "phpseclib/phpseclib": "3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "HopeOfIran\\ParsianRefund\\": "src/"
+    }
+  },
+    "config": {
+        "sort-packages": true
+    }
+}
