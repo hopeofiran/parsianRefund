@@ -31,7 +31,7 @@ HopeOfIran\ParsianRefund\Providers\ParsianRefundProvider::class
 ## vendor:publish
 You can run vendor:publish command to have custom config file of package on this path ( config/parsianRefund.php )
 ```
-php artisan vendor:publish --provider=HopeOfIran\NicardPayment\Providers\NicardPaymentProvider
+php artisan vendor:publish --provider=HopeOfIran\ParsianRefund\Providers\ParsianRefundProvider
 ```
 
 ```
