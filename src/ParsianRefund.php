@@ -18,25 +18,25 @@ class ParsianRefund
      *
      * @var int
      */
-    protected $refundId;
+    protected $refundId = 0;
     /**
      * Bank reference number with which the transaction was successful
      *
      * @var int
      */
-    protected $rrn;
+    protected $rrn = 0;
     /**
      * refund amount
      *
      * @var int
      */
-    protected $amount;
+    protected $amount = 0;
     /**
      * Refund settings
      *
      * @var array
      */
-    protected $settings;
+    protected $settings = [];
     /**
      * @var \phpseclib3\Crypt\RSA
      */
@@ -44,7 +44,7 @@ class ParsianRefund
     /**
      * @var string
      */
-    protected $token;
+    protected $token = '';
 
     /**
      * @param $settings
