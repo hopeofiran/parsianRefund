@@ -220,4 +220,15 @@ class ParsianRefund
         $token = $token == null ? $this->token : $token;
         return $this->httpRequest()->post("cancel", $this->getRequest(["Token" => $token]));
     }
+
+    /**
+     * @param  string  $token
+     *
+     * @return \Illuminate\Http\Client\Response
+     */
+    public function inquiry(string $token = null)
+    {
+        $token = $token == null ? $this->token : $token;
+        return $this->httpRequest()->post("Inquiry", $this->getRequest(["Token" => $token]));
+    }
 }
