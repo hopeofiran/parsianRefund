@@ -45,7 +45,7 @@ return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
                 return $exception->getMessage();
             }
         });
-``` php
+```
 
 ## Sampel code (cancel)
 ``` php
@@ -60,7 +60,7 @@ return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
                 return $exception->getMessage();
             }
         });
-``` php
+```
 
 ## Sampel code (inquiry)
 ``` php
@@ -75,7 +75,7 @@ return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
                 return $exception->getMessage();
             }
         });
-``` php
+```
 
 ## Sampel code 
 ``` php
@@ -88,4 +88,4 @@ return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
         return $exception->getMessage();
     }
     $response = \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::inquiry($token);
-``` php
+```
