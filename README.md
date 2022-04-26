@@ -35,7 +35,8 @@ php artisan vendor:publish --provider=HopeOfIran\ParsianRefund\Providers\Parsian
 ```
 
 ``` php
-return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
+Route::any('/approve', function () {
+    return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
         ->RRN(730157156588)
         ->refundId(187173594849597)
         ->refund(function (HopeOfIran\ParsianRefund\ParsianRefund $parsianRefund) {
@@ -45,11 +46,13 @@ return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
                 return $exception->getMessage();
             }
         });
+})->name('approve');
 ```
 
 ## Sampel code (cancel)
 ``` php
-return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
+Route::any('/cancel', function () {
+    return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
         ->RRN(730157156588)
         ->refundId(187173594849597)
         ->refund(function (HopeOfIran\ParsianRefund\ParsianRefund $parsianRefund) {
@@ -60,11 +63,13 @@ return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
                 return $exception->getMessage();
             }
         });
+})->name('cancel');
 ```
 
 ## Sampel code (inquiry)
 ``` php
-return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
+Route::any('/inquiry', function () {
+    return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
         ->RRN(730157156588)
         ->refundId(187173594849597)
         ->refund(function (HopeOfIran\ParsianRefund\ParsianRefund $parsianRefund) {
@@ -75,10 +80,12 @@ return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
                 return $exception->getMessage();
             }
         });
+})->name('inquiry');
 ```
 
 ## Sampel code 
 ``` php
+Route::any('/inquiry', function () {
     try {
         $token = \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
             ->refundId('196959050035088')
@@ -88,4 +95,6 @@ return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
         return $exception->getMessage();
     }
     $response = \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::inquiry($token);
+    return $response->body();
+})->name('inquiry');
 ```
