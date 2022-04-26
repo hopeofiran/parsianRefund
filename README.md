@@ -34,27 +34,58 @@ You can run vendor:publish command to have custom config file of package on this
 php artisan vendor:publish --provider=HopeOfIran\ParsianRefund\Providers\ParsianRefundProvider
 ```
 
-```
+``` php
 return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
         ->RRN(730157156588)
-        ->refundId(187173594849597)->refund(function (HopeOfIran\ParsianRefund\ParsianRefund $parsianRefund) {
+        ->refundId(187173594849597)
+        ->refund(function (HopeOfIran\ParsianRefund\ParsianRefund $parsianRefund) {
             try {
                 return $parsianRefund->approve();
             } catch (\Exception $exception) {
                 return $exception->getMessage();
             }
         });
-```
+``` php
 
 ## Sampel code (cancel)
-```
+``` php
 return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
         ->RRN(730157156588)
-        ->refundId(187173594849597)->refund(function (HopeOfIran\ParsianRefund\ParsianRefund $parsianRefund) {
+        ->refundId(187173594849597)
+        ->refund(function (HopeOfIran\ParsianRefund\ParsianRefund $parsianRefund) {
             try {
-                return $parsianRefund->cancel();
+                $rsponse = $parsianRefund->cancel();
+                return $rsponse->body();
             } catch (\Exception $exception) {
                 return $exception->getMessage();
             }
         });
-```
+``` php
+
+## Sampel code (inquiry)
+``` php
+return \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
+        ->RRN(730157156588)
+        ->refundId(187173594849597)
+        ->refund(function (HopeOfIran\ParsianRefund\ParsianRefund $parsianRefund) {
+            try {
+                $rsponse = $parsianRefund->inquiry();
+                return $rsponse->body();
+            } catch (\Exception $exception) {
+                return $exception->getMessage();
+            }
+        });
+``` php
+
+## Sampel code 
+``` php
+    try {
+        $token = \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::amount(1000)
+            ->refundId('196959050035088')
+            ->RRN('731858787109')
+            ->getToken();
+    } catch (Exception $exception) {
+        return $exception->getMessage();
+    }
+    $response = \HopeOfIran\ParsianRefund\Facades\ParsianRefundFacade::inquiry($token);
+``` php

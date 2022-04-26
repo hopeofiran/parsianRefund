@@ -18,13 +18,13 @@ class ParsianRefund
      *
      * @var int
      */
-    protected $refundId = 0;
+    protected $refundId;
     /**
      * Bank reference number with which the transaction was successful
      *
      * @var int
      */
-    protected $rrn = 0;
+    protected $rrn;
     /**
      * refund amount
      *
@@ -172,27 +172,14 @@ class ParsianRefund
     }
 
     /**
-     * @param  null  $finalizeCallback
+     * @param  callable  $finalizeCallback
      *
      * @return string
+     * @throws \Exception
      */
-    public function refund($finalizeCallback = null)
+    public function refund(callable $finalizeCallback = null)
     {
-        $fields = [
-            "RefundId" => $this->refundId,
-            "RRN"      => $this->rrn,
-            "Amount"   => $this->amount,
-        ];
-        if ($this->targetCardNumber) {
-            $fields['TargetCardNumber'] = $this->targetCardNumber;
-        }
-        $response = $this->httpRequest()->post("doRefund", $this->getRequest($fields));
-        try {
-            $this->token = $response->json('Data')['Token'];
-        } catch (\Exception $exception) {
-            logs()->error('ParsianRefund' . $exception->getMessage());
-        }
-
+        $response = $this->doRefund();
         if ($finalizeCallback) {
             return call_user_func($finalizeCallback, $this, $response->json());
         }
@@ -203,10 +190,13 @@ class ParsianRefund
      * @param  string  $token
      *
      * @return \Illuminate\Http\Client\Response
+     * @throws \Exception
      */
     public function approve(string $token = null)
     {
-        $token = $token == null ? $this->token : $token;
+        if ($token == null) {
+            $token = $this->doRefund();
+        }
         return $this->httpRequest()->post("approve", $this->getRequest(["Token" => $token]));
     }
 
@@ -214,10 +204,13 @@ class ParsianRefund
      * @param  string  $token
      *
      * @return \Illuminate\Http\Client\Response
+     * @throws \Exception
      */
     public function cancel(string $token = null)
     {
-        $token = $token == null ? $this->token : $token;
+        if ($token == null) {
+            $token = $this->doRefund();
+        }
         return $this->httpRequest()->post("cancel", $this->getRequest(["Token" => $token]));
     }
 
@@ -225,10 +218,50 @@ class ParsianRefund
      * @param  string  $token
      *
      * @return \Illuminate\Http\Client\Response
+     * @throws \Exception
      */
     public function inquiry(string $token = null)
     {
-        $token = $token == null ? $this->token : $token;
+        if ($token == null) {
+            $token = $this->doRefund();
+        }
         return $this->httpRequest()->post("Inquiry", $this->getRequest(["Token" => $token]));
+    }
+
+    public function getToken()
+    {
+        if ($this->token == null) {
+            $this->doRefund();
+        }
+        return $this->token;
+    }
+
+    /**
+     * @return \Illuminate\Http\Client\Response
+     * @throws \Exception
+     */
+    private function doRefund() : \Illuminate\Http\Client\Response
+    {
+        if ($this->rrn == null) {
+            throw new \Exception('RRN is requrred');
+        }
+        if ($this->refundId == null) {
+            throw new \Exception('RefundID is requrred');
+        }
+        $fields = [
+            "RefundId" => $this->refundId,
+            "RRN"      => $this->rrn,
+            "Amount"   => $this->amount,
+        ];
+        if ($this->targetCardNumber) {
+            $fields['TargetCardNumber'] = $this->targetCardNumber;
+        }
+        $response = $this->httpRequest()->post("doRefund", $this->getRequest($fields));
+        if ($response->json('Data') == null) {
+            throw new \Exception($response->json('Message'), $response->json('Status'));
+        }
+        $this->token = $response->json('Data')['Token'];
+
+        return $response;
     }
 }
