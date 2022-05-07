@@ -54,6 +54,7 @@ class ParsianRefund
     public function __construct($settings)
     {
         $this->settings  = empty($settings) ? $this->loadDefaultConfig() : $settings;
+        $this->refundId  = time();
         $this->CRYPT_RSA = new RSAProcessor($this->settings['certificate'], $this->settings['certificateType']);
     }
 
@@ -195,7 +196,7 @@ class ParsianRefund
     public function approve(string $token = null)
     {
         if ($token == null) {
-            $token = $this->doRefund();
+            $token = $this->getToken();
         }
         return $this->httpRequest()->post("approve", $this->getRequest(["Token" => $token]));
     }
@@ -209,7 +210,7 @@ class ParsianRefund
     public function cancel(string $token = null)
     {
         if ($token == null) {
-            $token = $this->doRefund();
+            $token = $this->getToken();
         }
         return $this->httpRequest()->post("cancel", $this->getRequest(["Token" => $token]));
     }
@@ -223,11 +224,15 @@ class ParsianRefund
     public function inquiry(string $token = null)
     {
         if ($token == null) {
-            $token = $this->doRefund();
+            $token = $this->getToken();
         }
         return $this->httpRequest()->post("Inquiry", $this->getRequest(["Token" => $token]));
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function getToken()
     {
         if ($this->token == null) {
@@ -242,20 +247,7 @@ class ParsianRefund
      */
     private function doRefund() : \Illuminate\Http\Client\Response
     {
-        if ($this->rrn == null) {
-            throw new \Exception('RRN is requrred');
-        }
-        if ($this->refundId == null) {
-            throw new \Exception('RefundID is requrred');
-        }
-        $fields = [
-            "RefundId" => $this->refundId,
-            "RRN"      => $this->rrn,
-            "Amount"   => $this->amount,
-        ];
-        if ($this->targetCardNumber) {
-            $fields['TargetCardNumber'] = $this->targetCardNumber;
-        }
+        $fields   = $this->getFields();
         $response = $this->httpRequest()->post("doRefund", $this->getRequest($fields));
         if ($response->json('Data') == null) {
             throw new \Exception($response->json('Message'), $response->json('Status'));
@@ -263,5 +255,35 @@ class ParsianRefund
         $this->token = $response->json('Data')['Token'];
 
         return $response;
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    private function getFields() : array
+    {
+        if ($this->rrn == null) {
+            throw new \Exception('RRN is requrred');
+        }
+        $fields = [
+            "RefundId" => $this->refundId,
+            "RRN"      => $this->rrn,
+        ];
+        if ($this->amount) {
+            $fields['Amount'] = $this->amount;
+        }
+        if ($this->targetCardNumber) {
+            $fields['TargetCardNumber'] = $this->targetCardNumber;
+        }
+        return $fields;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRefundId() : int
+    {
+        return $this->refundId;
     }
 }
