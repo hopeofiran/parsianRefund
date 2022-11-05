@@ -57,8 +57,8 @@ Route::any('/cancel', function () {
         ->refundId(187173594849597)
         ->refund(function (HopeOfIran\ParsianRefund\ParsianRefund $parsianRefund) {
             try {
-                $rsponse = $parsianRefund->cancel();
-                return $rsponse->body();
+                $response = $parsianRefund->cancel();
+                return $response->body();
             } catch (\Exception $exception) {
                 return $exception->getMessage();
             }
@@ -74,8 +74,8 @@ Route::any('/inquiry', function () {
         ->refundId(187173594849597)
         ->refund(function (HopeOfIran\ParsianRefund\ParsianRefund $parsianRefund) {
             try {
-                $rsponse = $parsianRefund->inquiry();
-                return $rsponse->body();
+                $response = $parsianRefund->inquiry();
+                return $response->body();
             } catch (\Exception $exception) {
                 return $exception->getMessage();
             }
