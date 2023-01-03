@@ -2,6 +2,7 @@
 
 namespace HopeOfIran\ParsianRefund;
 
+use GuzzleHttp\Exception\RequestException;
 use HopeOfIran\ParsianRefund\Utils\RSAProcessor;
 use Illuminate\Support\Facades\Http;
 
@@ -248,7 +249,11 @@ class ParsianRefund
     private function doRefund() : \Illuminate\Http\Client\Response
     {
         $fields   = $this->getFields();
-        $response = $this->httpRequest()->post("doRefund", $this->getRequest($fields));
+        $response = $this->httpRequest()
+            ->timeout($this->settings['http_request']['time_out'])
+            ->retry($this->settings['http_request']['retry_times'], $this->settings['http_request']['retry_sleep'], function ($exeption) {
+                return !($exeption instanceof RequestException);
+            })->post("doRefund", $this->getRequest($fields));
         if ($response->json('Data') == null) {
             throw new \Exception($response->json('Message'), $response->json('Status'));
         }
