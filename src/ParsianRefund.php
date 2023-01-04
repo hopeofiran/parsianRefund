@@ -2,8 +2,11 @@
 
 namespace HopeOfIran\ParsianRefund;
 
+use Exception;
 use GuzzleHttp\Exception\RequestException;
 use HopeOfIran\ParsianRefund\Utils\RSAProcessor;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 class ParsianRefund
@@ -146,10 +149,14 @@ class ParsianRefund
     /**
      * @return \Illuminate\Http\Client\PendingRequest
      */
-    protected function httpRequest() : \Illuminate\Http\Client\PendingRequest
+    protected function httpRequest() : PendingRequest
     {
         $response = Http::baseUrl($this->settings['apiRefundUrl'])
             ->withBasicAuth($this->settings['username'], $this->settings['password'])
+            ->timeout($this->settings['http_request']['time_out'])
+            ->retry($this->settings['http_request']['retry_times'], $this->settings['http_request']['retry_sleep'], function ($exeption) {
+                return !($exeption instanceof RequestException);
+            })
             ->asForm();
         if ($this->settings['withoutVerifying'] === 'true') {
             $response->withoutVerifying();
@@ -246,16 +253,12 @@ class ParsianRefund
      * @return \Illuminate\Http\Client\Response
      * @throws \Exception
      */
-    private function doRefund() : \Illuminate\Http\Client\Response
+    private function doRefund() : Response
     {
         $fields   = $this->getFields();
-        $response = $this->httpRequest()
-            ->timeout($this->settings['http_request']['time_out'])
-            ->retry($this->settings['http_request']['retry_times'], $this->settings['http_request']['retry_sleep'], function ($exeption) {
-                return !($exeption instanceof RequestException);
-            })->post("doRefund", $this->getRequest($fields));
+        $response = $this->httpRequest()->post("doRefund", $this->getRequest($fields));
         if ($response->json('Data') == null) {
-            throw new \Exception($response->json('Message'), $response->json('Status'));
+            throw new Exception($response->json('Message'), $response->json('Status'));
         }
         $this->token = $response->json('Data')['Token'];
 
@@ -269,7 +272,10 @@ class ParsianRefund
     private function getFields() : array
     {
         if ($this->rrn == null) {
-            throw new \Exception('RRN is requrred');
+            throw new Exception('RRN is required');
+        }
+        if ($this->refundId == null) {
+            throw new Exception('refundId is required');
         }
         $fields = [
             "RefundId" => $this->refundId,
