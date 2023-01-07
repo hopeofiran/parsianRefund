@@ -206,7 +206,11 @@ class ParsianRefund
         if ($token == null) {
             $token = $this->getToken();
         }
-        return $this->httpRequest()->post("approve", $this->getRequest(["Token" => $token]));
+        $response = $this->httpRequest()->post("approve", $this->getRequest(["Token" => $token]));
+        if ($response->json('Data') == null) {
+            throw new Exception($response->json('Message'), $response->json('Status'));
+        }
+        return $response;
     }
 
     /**
